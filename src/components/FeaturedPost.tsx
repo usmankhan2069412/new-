@@ -24,14 +24,14 @@ const FeaturedPost = ({
   onClick = () => console.log("Featured post clicked"),
 }: FeaturedPostProps) => {
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-white">
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 bg-card">
       <div
         className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
         onClick={onClick}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40 z-10" />
 
-        <div className="relative z-20 flex flex-col h-full justify-end p-6 sm:p-8 md:p-12 text-white">
+        <div className="relative z-20 flex flex-col h-full justify-end p-4 sm:p-8 md:p-12 text-white">
           <div className="space-y-6 max-w-3xl">
             <Badge className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1">
               {category}

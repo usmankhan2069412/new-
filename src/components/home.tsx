@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import FeaturedPost from "./FeaturedPost";
 import PostGrid from "./PostGrid";
+import SEO from "./SEO.jsx";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Parse search query from URL on component mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [location.search]);
+
   // Mock data for featured post
   const featuredPost = {
     title: "Building Scalable Web Applications with Modern Architecture",
@@ -97,36 +112,59 @@ const Home = () => {
   // Event handlers
   const handlePostClick = (postId: string) => {
     console.log(`Navigating to post with ID: ${postId}`);
-    // In a real app, this would navigate to the post detail page
+    // Navigate to the post detail page
+    navigate(`/post/${postId}`);
   };
 
   const handleFeaturedPostClick = () => {
     console.log("Navigating to featured post");
-    // In a real app, this would navigate to the featured post detail page
+    // Navigate to the featured post detail page
+    navigate(`/post/7`);
   };
 
   const handleSearch = (query: string) => {
     console.log(`Searching for: ${query}`);
-    // In a real app, this would trigger a search and update the post list
+    // Update URL with search query
+    const params = new URLSearchParams();
+    if (query.trim() !== "") {
+      params.set("q", query);
+      navigate({ search: params.toString() });
+      setSearchQuery(query);
+    } else {
+      navigate({ search: "" });
+      setSearchQuery("");
+    }
   };
 
   const handleCategorySelect = (category: string) => {
     console.log(`Selected category: ${category}`);
     // In a real app, this would filter posts by category
+    // This is now handled in the PostGrid component
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      {/* SEO */}
+      <SEO
+        title="BlogHub - Modern Blog Platform"
+        description="A clean, responsive blogging platform with a focus on readability and content discovery. Explore our articles on web development, technology, design and more."
+        keywords="blog, articles, web development, technology, design, UX design, backend, architecture"
+        ogImage="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80"
+      />
+
       {/* Header */}
       <Header
         categories={categories.filter((cat) => cat !== "All")}
         onSearch={handleSearch}
         onCategorySelect={handleCategorySelect}
+        posts={blogPosts}
       />
 
       <main className="flex-grow">
-        {/* Featured Post Section */}
-        <FeaturedPost {...featuredPost} onClick={handleFeaturedPostClick} />
+        {/* Only show featured post if not searching */}
+        {!searchQuery && (
+          <FeaturedPost {...featuredPost} onClick={handleFeaturedPostClick} />
+        )}
 
         {/* Post Grid Section */}
         <PostGrid

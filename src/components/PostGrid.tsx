@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PostCard from "./PostCard";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -93,13 +93,64 @@ const PostGrid = ({
 }: PostGridProps) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isGridView, setIsGridView] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const postsPerPage = 6;
 
-  // Filter posts by category
-  const filteredPosts =
-    activeCategory === "All"
-      ? posts
-      : posts.filter((post) => post.category === activeCategory);
+  // Listen for view mode changes from Header component
+  useEffect(() => {
+    const handleViewModeChange = (event: CustomEvent) => {
+      setIsGridView(event.detail.isGridView);
+    };
+
+    // Add event listener
+    window.addEventListener(
+      "viewModeChange",
+      handleViewModeChange as EventListener,
+    );
+
+    // Check for existing view mode in localStorage
+    try {
+      const savedViewMode = localStorage.getItem("viewMode");
+      if (savedViewMode !== null) {
+        setIsGridView(savedViewMode === "grid");
+      }
+    } catch (error) {
+      console.error("Error reading view mode from localStorage:", error);
+    }
+
+    return () => {
+      window.removeEventListener(
+        "viewModeChange",
+        handleViewModeChange as EventListener,
+      );
+    };
+  }, []);
+
+  // Listen for search query changes from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("q");
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, []);
+
+  // Filter posts by category and search query
+  const filteredPosts = posts.filter((post) => {
+    // First filter by category
+    const matchesCategory =
+      activeCategory === "All" || post.category === activeCategory;
+
+    // Then filter by search query if it exists
+    const matchesSearch = searchQuery
+      ? post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.category.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+
+    return matchesCategory && matchesSearch;
+  });
 
   // Calculate pagination
   const indexOfLastPost = currentPage * postsPerPage;
@@ -108,79 +159,115 @@ const PostGrid = ({
   const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-background">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 bg-background">
       <div className="mb-8">
         <h2 className="text-3xl font-bold tracking-tight mb-6">
-          Latest Articles
+          {searchQuery
+            ? `Search Results for "${searchQuery}"`
+            : "Latest Articles"}
         </h2>
 
-        <Tabs defaultValue="All" className="w-full">
-          <TabsList className="mb-8 flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <TabsTrigger
-                key={category}
-                value={category}
-                onClick={() => {
-                  setActiveCategory(category);
-                  setCurrentPage(1);
-                }}
-                className="px-4 py-2"
-              >
-                {category}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
+        {!searchQuery && (
+          <Tabs defaultValue="All" className="w-full">
+            <TabsList className="mb-8 flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  onClick={() => {
+                    setActiveCategory(category);
+                    setCurrentPage(1);
+                  }}
+                  className="px-4 py-2"
+                >
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        {currentPosts.map((post) => (
-          <PostCard
-            key={post.id}
-            title={post.title}
-            excerpt={post.excerpt}
-            date={post.date}
-            imageUrl={post.imageUrl}
-            category={post.category}
-            onClick={() => onPostClick(post.id)}
-          />
-        ))}
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-10">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="h-10 w-10 p-0"
-          >
-            &lt;
-          </Button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        {searchQuery && filteredPosts.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-lg text-muted-foreground">
+              No results found for "{searchQuery}"
+            </p>
             <Button
-              key={page}
-              variant={currentPage === page ? "default" : "outline"}
-              onClick={() => setCurrentPage(page)}
-              className="h-10 w-10 p-0"
+              variant="outline"
+              className="mt-4"
+              onClick={() => {
+                setSearchQuery("");
+                window.history.pushState({}, "", window.location.pathname);
+              }}
             >
-              {page}
+              Clear Search
             </Button>
-          ))}
+          </div>
+        )}
+      </div>
 
-          <Button
-            variant="outline"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+      {filteredPosts.length > 0 && (
+        <>
+          <div
+            className={
+              isGridView
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+                : "flex flex-col space-y-6 mb-10"
             }
-            disabled={currentPage === totalPages}
-            className="h-10 w-10 p-0"
+            id="post-container"
+            data-view-mode={isGridView ? "grid" : "list"}
           >
-            &gt;
-          </Button>
-        </div>
+            {currentPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                title={post.title}
+                excerpt={post.excerpt}
+                date={post.date}
+                imageUrl={post.imageUrl}
+                category={post.category}
+                onClick={() => onPostClick(post.id)}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-10">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="h-10 w-10 p-0"
+              >
+                &lt;
+              </Button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    onClick={() => setCurrentPage(page)}
+                    className="h-10 w-10 p-0"
+                  >
+                    {page}
+                  </Button>
+                ),
+              )}
+
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="h-10 w-10 p-0"
+              >
+                &gt;
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

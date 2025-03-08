@@ -12,8 +12,20 @@ const basename = import.meta.env.BASE_URL;
 
 // Initialize theme from localStorage
 const initializeTheme = () => {
-  const savedTheme = localStorage.getItem("theme") || "light";
-  document.documentElement.setAttribute("data-theme", savedTheme);
+  try {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+
+    // Force repaint to apply theme
+    document.body.style.display = "none";
+    document.body.offsetHeight; // Trigger a reflow
+    document.body.style.display = "";
+  } catch (error) {
+    console.error("Error initializing theme:", error);
+    // Fallback to light theme
+    document.documentElement.setAttribute("data-theme", "light");
+  }
 };
 
 // Call the function before rendering
