@@ -285,10 +285,10 @@ const Header = ({
 
           {user ? (
             <div className="flex items-center gap-4">
-              <Link to="/create">
+              <Link to="/admin">
                 <Button className="flex items-center gap-2">
                   <PenSquare className="h-4 w-4" />
-                  Write Post
+                  Dashboard
                 </Button>
               </Link>
               <Button variant="outline" onClick={logout}>
@@ -516,10 +516,10 @@ const Header = ({
                   {user ? (
                     <>
                       <SheetClose asChild>
-                        <Link to="/create">
+                        <Link to="/admin">
                           <Button className="w-full flex items-center justify-center gap-2">
                             <PenSquare className="h-4 w-4" />
-                            Write Post
+                            Dashboard
                           </Button>
                         </Link>
                       </SheetClose>
