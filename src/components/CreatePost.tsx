@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
+import { createPost } from "@/lib/api";
 import {
   Select,
   SelectContent,
@@ -70,14 +71,36 @@ const CreatePost = () => {
     setPreviewImage(imageUrl);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would send the data to an API
-    console.log("Submitting post:", formData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    // For demo purposes, just navigate back to home
-    alert("Post created successfully!");
-    navigate("/");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // Save post to database
+      await createPost({
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        category: formData.category,
+        image_url: formData.imageUrl,
+        author: "Admin User",
+        author_avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
+        read_time: "5 min read", // This will be calculated in the API
+        date: new Date().toISOString(),
+      });
+
+      alert("Post published successfully!");
+      navigate("/");
+    } catch (err) {
+      console.error("Error creating post:", err);
+      setError("Failed to publish post. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -201,9 +224,14 @@ const CreatePost = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-primary text-white">
+              {error && <div className="text-destructive text-sm">{error}</div>}
+              <Button
+                type="submit"
+                className="bg-primary text-white"
+                disabled={isSubmitting}
+              >
                 <Upload className="mr-2 h-4 w-4" />
-                Publish Post
+                {isSubmitting ? "Publishing..." : "Publish Post"}
               </Button>
             </CardFooter>
           </form>

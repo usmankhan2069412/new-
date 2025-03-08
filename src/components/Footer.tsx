@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Facebook, Github, Instagram, Twitter } from "lucide-react";
 
 const Footer = () => {
@@ -164,6 +165,14 @@ const Footer = () => {
                 >
                   Careers
                 </a>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-gray-400 hover:text-white transition-colors text-sm"
+                >
+                  Contact Us
+                </Link>
               </li>
             </ul>
           </div>

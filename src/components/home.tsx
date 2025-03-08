@@ -5,11 +5,36 @@ import FeaturedPost from "./FeaturedPost";
 import PostGrid from "./PostGrid";
 import SEO from "./SEO.jsx";
 import Footer from "./Footer";
+import { getPosts } from "@/lib/api";
+import { Post } from "@/lib/api";
+import { Button } from "./ui/button";
+import { useAuth } from "./auth/AuthContext";
 
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // State for blog posts from database
+  const [blogPosts, setBlogPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch posts from database
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const posts = await getPosts();
+        setBlogPosts(posts);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   // Parse search query from URL on component mount
   useEffect(() => {
@@ -31,70 +56,6 @@ const Home = () => {
       "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80",
     category: "Architecture",
   };
-
-  // Mock data for blog posts
-  const blogPosts = [
-    {
-      id: "1",
-      title: "How to Build a Modern Blog with React and Tailwind",
-      excerpt:
-        "Learn the best practices for creating a responsive and accessible blog using the latest web technologies.",
-      date: "April 15, 2023",
-      imageUrl:
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80",
-      category: "Web Development",
-    },
-    {
-      id: "2",
-      title: "The Future of AI in Content Creation",
-      excerpt:
-        "Explore how artificial intelligence is transforming the way we create and consume content online.",
-      date: "May 3, 2023",
-      imageUrl:
-        "https://images.unsplash.com/photo-1677442135136-760c813028c4?w=600&q=80",
-      category: "Technology",
-    },
-    {
-      id: "3",
-      title: "Designing for Accessibility: A Comprehensive Guide",
-      excerpt:
-        "Why accessibility matters and how to implement inclusive design principles in your next project.",
-      date: "June 12, 2023",
-      imageUrl:
-        "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&q=80",
-      category: "Design",
-    },
-    {
-      id: "4",
-      title: "Optimizing React Performance: Tips and Tricks",
-      excerpt:
-        "Advanced techniques to make your React applications faster and more efficient.",
-      date: "July 8, 2023",
-      imageUrl:
-        "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=600&q=80",
-      category: "Web Development",
-    },
-    {
-      id: "5",
-      title: "The Psychology of User Experience",
-      excerpt:
-        "Understanding how human psychology influences user behavior and decision-making in digital products.",
-      date: "August 21, 2023",
-      imageUrl:
-        "https://images.unsplash.com/photo-1581287053822-fd7bf4f4bfec?w=600&q=80",
-      category: "UX Design",
-    },
-    {
-      id: "6",
-      title: "Building a Serverless Backend for Your Blog",
-      excerpt:
-        "Step-by-step guide to creating a scalable and cost-effective backend using serverless technologies.",
-      date: "September 5, 2023",
-      imageUrl:
-        "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=600&q=80",
-      category: "Backend",
-    },
-  ];
 
   // Categories for navigation and filtering
   const categories = [
@@ -162,17 +123,66 @@ const Home = () => {
       />
 
       <main className="flex-grow">
-        {/* Only show featured post if not searching */}
-        {!searchQuery && (
-          <FeaturedPost {...featuredPost} onClick={handleFeaturedPostClick} />
+        {/* Only show featured post if not searching and we have posts */}
+        {!searchQuery && !loading && blogPosts.length > 0 && (
+          <FeaturedPost
+            title={blogPosts[0]?.title || featuredPost.title}
+            excerpt={blogPosts[0]?.excerpt || featuredPost.excerpt}
+            date={
+              blogPosts[0]?.date
+                ? new Date(blogPosts[0].date).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : featuredPost.date
+            }
+            readTime={blogPosts[0]?.read_time || featuredPost.readTime}
+            imageUrl={blogPosts[0]?.image_url || featuredPost.imageUrl}
+            category={blogPosts[0]?.category || featuredPost.category}
+            onClick={() => handlePostClick(blogPosts[0]?.id || "1")}
+          />
         )}
 
         {/* Post Grid Section */}
-        <PostGrid
-          posts={blogPosts}
-          categories={categories}
-          onPostClick={handlePostClick}
-        />
+        {loading ? (
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex justify-center">
+            <div className="animate-pulse space-y-8 w-full">
+              <div className="h-8 bg-muted rounded w-1/3 mx-auto"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-card rounded-lg overflow-hidden">
+                    <div className="h-48 bg-muted"></div>
+                    <div className="p-4 space-y-3">
+                      <div className="h-6 bg-muted rounded w-3/4"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-1/2"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : blogPosts.length > 0 ? (
+          <PostGrid
+            posts={blogPosts}
+            categories={categories}
+            onPostClick={handlePostClick}
+          />
+        ) : (
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+            <h2 className="text-2xl font-bold mb-4">No posts found</h2>
+            <p className="text-muted-foreground mb-6">
+              There are no blog posts available yet.
+            </p>
+            {user?.role === "admin" && (
+              <Button onClick={() => navigate("/create")}>
+                Create Your First Post
+              </Button>
+            )}
+          </div>
+        )}
       </main>
 
       {/* Footer */}

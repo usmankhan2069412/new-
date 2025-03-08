@@ -6,6 +6,8 @@ import Header from "./Header";
 import PostSEO from "./PostSEO.jsx";
 import { Badge } from "./ui/badge";
 import Footer from "./Footer";
+import { getPost } from "@/lib/api";
+import { Post } from "@/lib/api";
 
 interface BlogPost {
   id: string;
@@ -893,21 +895,27 @@ resources:
     },
   ];
 
-  // Find the post by ID
+  // Fetch post from database by ID
   React.useEffect(() => {
     if (postId) {
       setLoading(true);
-      // Simulate API call with timeout
-      setTimeout(() => {
-        const foundPost = blogPosts.find((post) => post.id === postId);
-        if (foundPost) {
-          setPost(foundPost);
-          setLoading(false);
-        } else {
-          setError("Post not found");
+      const fetchPost = async () => {
+        try {
+          const fetchedPost = await getPost(postId);
+          if (fetchedPost) {
+            setPost(fetchedPost as any);
+          } else {
+            setError("Post not found");
+          }
+        } catch (err) {
+          console.error("Error fetching post:", err);
+          setError("Failed to load post");
+        } finally {
           setLoading(false);
         }
-      }, 500);
+      };
+
+      fetchPost();
     }
   }, [postId]);
 

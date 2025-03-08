@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "./auth/AuthContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {
@@ -55,6 +56,7 @@ const Header = ({
   posts = [],
 }: HeaderProps) => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -270,15 +272,37 @@ const Header = ({
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link
+                  to="/contact"
+                  className="flex items-center px-4 py-2 text-sm font-medium"
+                >
+                  Contact
+                </Link>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
 
-          <Link to="/create">
-            <Button className="flex items-center gap-2">
-              <PenSquare className="h-4 w-4" />
-              Write Post
-            </Button>
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <Link to="/create">
+                <Button className="flex items-center gap-2">
+                  <PenSquare className="h-4 w-4" />
+                  Write Post
+                </Button>
+              </Link>
+              <Button variant="outline" onClick={logout}>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Link to="/login">
+              <Button className="flex items-center gap-2">
+                <PenSquare className="h-4 w-4" />
+                Admin Login
+              </Button>
+            </Link>
+          )}
 
           {/* Toggle Buttons */}
           <div className="flex items-center space-x-4">
@@ -477,18 +501,48 @@ const Header = ({
                         </a>
                       </SheetClose>
                     ))}
+                    <SheetClose asChild>
+                      <Link
+                        to="/contact"
+                        className="px-2 py-1.5 text-sm rounded-md hover:bg-accent"
+                      >
+                        Contact Us
+                      </Link>
+                    </SheetClose>
                   </nav>
                 </div>
 
-                <div className="mt-6">
-                  <SheetClose asChild>
-                    <Link to="/create">
-                      <Button className="w-full flex items-center justify-center gap-2">
-                        <PenSquare className="h-4 w-4" />
-                        Write Post
-                      </Button>
-                    </Link>
-                  </SheetClose>
+                <div className="mt-6 space-y-4">
+                  {user ? (
+                    <>
+                      <SheetClose asChild>
+                        <Link to="/create">
+                          <Button className="w-full flex items-center justify-center gap-2">
+                            <PenSquare className="h-4 w-4" />
+                            Write Post
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={logout}
+                        >
+                          Logout
+                        </Button>
+                      </SheetClose>
+                    </>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link to="/login">
+                        <Button className="w-full flex items-center justify-center gap-2">
+                          <PenSquare className="h-4 w-4" />
+                          Admin Login
+                        </Button>
+                      </Link>
+                    </SheetClose>
+                  )}
                 </div>
               </div>
             </SheetContent>
