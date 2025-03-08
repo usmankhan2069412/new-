@@ -4,6 +4,7 @@ import Header from "./Header";
 import FeaturedPost from "./FeaturedPost";
 import PostGrid from "./PostGrid";
 import SEO from "./SEO.jsx";
+import Footer from "./Footer";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -175,76 +176,7 @@ const Home = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-muted py-12 mt-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="md:col-span-2">
-              <h3 className="text-xl font-bold mb-4">BlogHub</h3>
-              <p className="text-muted-foreground mb-4">
-                A modern blogging platform focused on clean design and
-                exceptional reading experience.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} BlogHub. All rights reserved.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-4">Categories</h4>
-              <ul className="space-y-2">
-                {categories.slice(1, 7).map((category) => (
-                  <li key={category}>
-                    <a
-                      href={`#${category.toLowerCase()}`}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {category}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-4">Links</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Contact
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
