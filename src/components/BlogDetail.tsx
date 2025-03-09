@@ -21,6 +21,8 @@ import { format } from "date-fns";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Separator } from "./ui/separator";
+import { useToast } from "./ui/use-toast";
+import { ToastAction } from "./ui/toast";
 
 interface BlogPost {
   id: string;
@@ -38,6 +40,7 @@ interface BlogPost {
 const BlogDetail = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +144,12 @@ const BlogDetail = () => {
     } else {
       // Fallback - copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
+      toast({
+        title: "Link Copied!",
+        description: "Post link copied to clipboard",
+        className: "bg-primary text-primary-foreground",
+        duration: 2000,
+      });
     }
   };
 
@@ -152,6 +160,15 @@ const BlogDetail = () => {
     const likedPosts = JSON.parse(localStorage.getItem("likedPosts") || "{}");
     likedPosts[postId] = !liked;
     localStorage.setItem("likedPosts", JSON.stringify(likedPosts));
+
+    if (!liked) {
+      toast({
+        title: "Post Liked",
+        description: "This post has been added to your liked posts",
+        className: "bg-rose-500 text-white",
+        duration: 1500,
+      });
+    }
   };
 
   const handleBookmark = () => {
@@ -163,6 +180,17 @@ const BlogDetail = () => {
     );
     bookmarkedPosts[postId] = !bookmarked;
     localStorage.setItem("bookmarkedPosts", JSON.stringify(bookmarkedPosts));
+
+    toast({
+      title: !bookmarked ? "Post Saved" : "Post Unsaved",
+      description: !bookmarked
+        ? "This post has been saved to your bookmarks"
+        : "This post has been removed from your bookmarks",
+      className: !bookmarked
+        ? "bg-green-600 text-white"
+        : "bg-slate-700 text-white",
+      duration: 1500,
+    });
   };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -582,20 +610,36 @@ const BlogDetail = () => {
                               "newsletter_subscribers",
                               JSON.stringify(subscribers),
                             );
-                            alert(
-                              "Thank you for subscribing to our newsletter!",
-                            );
+                            toast({
+                              title: "Subscription Successful!",
+                              description:
+                                "Thank you for subscribing to our newsletter!",
+                              variant: "default",
+                              className: "bg-green-600 text-white",
+                            });
                             emailInput.value = "";
                           } else {
-                            alert(
-                              "You are already subscribed to our newsletter.",
-                            );
+                            toast({
+                              title: "Already Subscribed",
+                              description:
+                                "You are already subscribed to our newsletter.",
+                              variant: "default",
+                              className: "bg-blue-600 text-white",
+                            });
                           }
                         } catch (err) {
                           console.error("Error saving subscriber:", err);
-                          alert(
-                            "There was an error processing your subscription. Please try again.",
-                          );
+                          toast({
+                            title: "Subscription Error",
+                            description:
+                              "There was an error processing your subscription. Please try again.",
+                            variant: "destructive",
+                            action: (
+                              <ToastAction altText="Try again">
+                                Try again
+                              </ToastAction>
+                            ),
+                          });
                         }
                       }}
                       className="space-y-2"

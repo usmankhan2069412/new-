@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useToast } from "../ui/use-toast";
 
 type User = {
   id: string;
@@ -26,6 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if user is already logged in from localStorage
@@ -61,6 +63,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = () => {
     setUser(null);
     localStorage.removeItem("blogHubUser");
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out",
+      className: "bg-slate-700 text-white",
+    });
   };
 
   const isAdmin = () => {

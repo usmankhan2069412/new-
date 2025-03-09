@@ -14,6 +14,7 @@ import {
 import { Alert, AlertDescription } from "../ui/alert";
 import { useAuth } from "./AuthContext";
 import { Lock } from "lucide-react";
+import { useToast } from "../ui/use-toast";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,9 +33,19 @@ const LoginForm = () => {
     try {
       const success = await login(email, password);
       if (success) {
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to BlogHub!",
+          className: "bg-green-600 text-white",
+        });
         navigate("/create");
       } else {
         setError("Invalid email or password");
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
       }
     } catch (err) {
       setError("An error occurred during login");

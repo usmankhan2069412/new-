@@ -11,6 +11,7 @@ import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import SubscribersList from "./components/admin/SubscribersList";
 import UnsubscribePage from "./components/UnsubscribePage";
+import { ToastProvider } from "./components/ui/toast-provider";
 import routes from "./tempo-routes";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <ToastProvider />
       <Suspense
         fallback={
           <div className="flex items-center justify-center min-h-screen">

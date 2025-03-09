@@ -10,11 +10,14 @@ import { Post } from "@/lib/api";
 import { Button } from "./ui/button";
 import { Input as InputComponent } from "./ui/input";
 import { useAuth } from "./auth/AuthContext";
+import { useToast } from "./ui/use-toast";
+import { ToastAction } from "./ui/toast";
 
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
 
   // State for blog posts from database
@@ -229,16 +232,33 @@ const Home = () => {
                     "newsletter_subscribers",
                     JSON.stringify(subscribers),
                   );
-                  alert("Thank you for subscribing to our newsletter!");
+                  toast({
+                    title: "Subscription Successful!",
+                    description: "Thank you for subscribing to our newsletter!",
+                    variant: "default",
+                    className: "bg-green-600 text-white",
+                  });
                   emailInput.value = "";
                 } else {
-                  alert("You are already subscribed to our newsletter.");
+                  toast({
+                    title: "Already Subscribed",
+                    description:
+                      "You are already subscribed to our newsletter.",
+                    variant: "default",
+                    className: "bg-blue-600 text-white",
+                  });
                 }
               } catch (err) {
                 console.error("Error saving subscriber:", err);
-                alert(
-                  "There was an error processing your subscription. Please try again.",
-                );
+                toast({
+                  title: "Subscription Error",
+                  description:
+                    "There was an error processing your subscription. Please try again.",
+                  variant: "destructive",
+                  action: (
+                    <ToastAction altText="Try again">Try again</ToastAction>
+                  ),
+                });
               }
             }}
           >
