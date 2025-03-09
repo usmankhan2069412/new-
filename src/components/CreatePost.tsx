@@ -299,7 +299,7 @@ npx tailwindcss init -p</code></pre>
         alert("Post updated successfully!");
       } else {
         // Create new post
-        await createPost({
+        const newPost = await createPost({
           title: formData.title,
           excerpt: formData.excerpt,
           content: formData.content,
@@ -311,7 +311,30 @@ npx tailwindcss init -p</code></pre>
           read_time: "5 min read", // This will be calculated in the API
           date: new Date().toISOString(),
         });
-        alert("Post published successfully!");
+
+        // Send newsletter to subscribers about the new post
+        try {
+          const { supabase } = await import("@/lib/supabase");
+          const { data, error } = await supabase.functions.invoke(
+            "send-newsletter",
+            {
+              body: { postId: newPost.id },
+            },
+          );
+
+          if (error) {
+            console.error("Error sending newsletter:", error);
+          } else {
+            console.log("Newsletter sent successfully:", data);
+          }
+        } catch (newsletterErr) {
+          console.error("Failed to send newsletter:", newsletterErr);
+          // Don't block the post creation if newsletter fails
+        }
+
+        alert(
+          "Post published successfully and newsletter sent to subscribers!",
+        );
       }
       navigate("/admin");
     } catch (err) {

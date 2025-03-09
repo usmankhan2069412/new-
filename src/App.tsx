@@ -10,6 +10,7 @@ import { AuthProvider } from "./components/auth/AuthContext";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import SubscribersList from "./components/admin/SubscribersList";
+import UnsubscribePage from "./components/UnsubscribePage";
 import routes from "./tempo-routes";
 
 function App() {
@@ -56,6 +57,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Unsubscribe page */}
+          <Route path="/unsubscribe" element={<UnsubscribePage />} />
 
           {/* Add this before any catchall route */}
           {import.meta.env.VITE_TEMPO === "true" && (

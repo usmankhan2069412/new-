@@ -279,7 +279,7 @@ const BlogDetail = () => {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <div className="relative h-[50vh] md:h-[60vh] w-full overflow-hidden">
+        <div className="relative h-[40vh] md:h-[50vh] max-h-[500px] w-full overflow-hidden">
           <img
             src={post.imageUrl}
             alt={post.title}
