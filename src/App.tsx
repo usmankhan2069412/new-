@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./components/auth/AuthContext";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
+import SubscribersList from "./components/admin/SubscribersList";
 import routes from "./tempo-routes";
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="edit/:postId" element={<CreatePost />} />
+            <Route path="subscribers" element={<SubscribersList />} />
           </Route>
 
           {/* Keep create post outside the layout for full-screen editing */}

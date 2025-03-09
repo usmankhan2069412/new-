@@ -8,6 +8,7 @@ import Footer from "./Footer";
 import { getPosts } from "@/lib/api";
 import { Post } from "@/lib/api";
 import { Button } from "./ui/button";
+import { Input as InputComponent } from "./ui/input";
 import { useAuth } from "./auth/AuthContext";
 
 const Home = () => {
@@ -184,6 +185,78 @@ const Home = () => {
           </div>
         )}
       </main>
+
+      {/* Newsletter Section */}
+      <section className="w-full bg-primary/5 py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            Subscribe to Our Newsletter
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Stay updated with our latest articles, tutorials, and resources.
+            We'll send you a weekly digest of the best content straight to your
+            inbox.
+          </p>
+          <form
+            className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const form = e.target as HTMLFormElement;
+              const emailInput = form.querySelector(
+                'input[type="email"]',
+              ) as HTMLInputElement;
+              const email = emailInput.value.trim();
+
+              if (!email) return;
+
+              // Save to localStorage
+              try {
+                const subscribers = JSON.parse(
+                  localStorage.getItem("newsletter_subscribers") || "[]",
+                );
+                const existingSubscriber = subscribers.find(
+                  (s) => s.email === email,
+                );
+
+                if (!existingSubscriber) {
+                  subscribers.push({
+                    id: Date.now().toString(),
+                    email,
+                    date: new Date().toLocaleDateString(),
+                    source: "homepage",
+                  });
+                  localStorage.setItem(
+                    "newsletter_subscribers",
+                    JSON.stringify(subscribers),
+                  );
+                  alert("Thank you for subscribing to our newsletter!");
+                  emailInput.value = "";
+                } else {
+                  alert("You are already subscribed to our newsletter.");
+                }
+              } catch (err) {
+                console.error("Error saving subscriber:", err);
+                alert(
+                  "There was an error processing your subscription. Please try again.",
+                );
+              }
+            }}
+          >
+            <InputComponent
+              type="email"
+              placeholder="Your email address"
+              className="flex-grow"
+              required
+            />
+            <Button type="submit" className="px-8">
+              Subscribe
+            </Button>
+          </form>
+          <p className="text-xs text-muted-foreground mt-4">
+            We respect your privacy. Unsubscribe at any time.
+          </p>
+        </div>
+      </section>
 
       {/* Footer */}
       <Footer />

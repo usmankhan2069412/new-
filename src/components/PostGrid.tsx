@@ -2,13 +2,21 @@ import React, { useState, useEffect } from "react";
 import PostCard from "./PostCard";
 import { Button } from "./ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./ui/carousel";
 
 interface Post {
   id: string;
   title: string;
   excerpt: string;
   date: string;
-  imageUrl: string;
+  imageUrl?: string;
+  image_url?: string;
   category: string;
 }
 
@@ -96,6 +104,7 @@ const PostGrid = ({
   const [isGridView, setIsGridView] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const postsPerPage = 6;
+  const postLimitForSlider = 9; // Limit after which slider is shown
 
   // Listen for view mode changes from Header component
   useEffect(() => {
@@ -136,8 +145,14 @@ const PostGrid = ({
     }
   }, []);
 
+  // Normalize posts to ensure they have imageUrl property
+  const normalizedPosts = posts.map((post) => ({
+    ...post,
+    imageUrl: post.imageUrl || post.image_url,
+  }));
+
   // Filter posts by category and search query
-  const filteredPosts = posts.filter((post) => {
+  const filteredPosts = normalizedPosts.filter((post) => {
     // First filter by category
     const matchesCategory =
       activeCategory === "All" || post.category === activeCategory;
@@ -208,30 +223,70 @@ const PostGrid = ({
 
       {filteredPosts.length > 0 && (
         <>
-          <div
-            className={
-              isGridView
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
-                : "flex flex-col space-y-6 mb-10"
-            }
-            id="post-container"
-            data-view-mode={isGridView ? "grid" : "list"}
-          >
-            {currentPosts.map((post) => (
-              <PostCard
-                key={post.id}
-                title={post.title}
-                excerpt={post.excerpt}
-                date={post.date}
-                imageUrl={post.imageUrl}
-                category={post.category}
-                onClick={() => onPostClick(post.id)}
-              />
-            ))}
-          </div>
+          {filteredPosts.length > postLimitForSlider ? (
+            <div className="mb-10">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {Array.from({
+                    length: Math.ceil(currentPosts.length / 3),
+                  }).map((_, index) => (
+                    <CarouselItem key={index} className="basis-full">
+                      <div
+                        className={
+                          isGridView
+                            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                            : "flex flex-col space-y-6"
+                        }
+                      >
+                        {currentPosts
+                          .slice(index * 3, (index + 1) * 3)
+                          .map((post) => (
+                            <PostCard
+                              key={post.id}
+                              title={post.title}
+                              excerpt={post.excerpt}
+                              date={post.date}
+                              imageUrl={post.imageUrl}
+                              category={post.category}
+                              onClick={() => onPostClick(post.id)}
+                            />
+                          ))}
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="flex justify-center mt-4">
+                  <CarouselPrevious className="relative mr-2" />
+                  <CarouselNext className="relative ml-2" />
+                </div>
+              </Carousel>
+            </div>
+          ) : (
+            <div
+              className={
+                isGridView
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+                  : "flex flex-col space-y-6 mb-10"
+              }
+              id="post-container"
+              data-view-mode={isGridView ? "grid" : "list"}
+            >
+              {currentPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  title={post.title}
+                  excerpt={post.excerpt}
+                  date={post.date}
+                  imageUrl={post.imageUrl}
+                  category={post.category}
+                  onClick={() => onPostClick(post.id)}
+                />
+              ))}
+            </div>
+          )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {/* Pagination - only show when not using slider */}
+          {totalPages > 1 && filteredPosts.length <= postLimitForSlider && (
             <div className="flex justify-center items-center gap-2 mt-10">
               <Button
                 variant="outline"

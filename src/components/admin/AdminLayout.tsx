@@ -2,7 +2,13 @@ import React from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "../ui/button";
-import { PenSquare, LayoutDashboard, Settings, LogOut } from "lucide-react";
+import {
+  PenSquare,
+  LayoutDashboard,
+  Settings,
+  LogOut,
+  Mail,
+} from "lucide-react";
 
 const AdminLayout = () => {
   const { user, logout } = useAuth();
@@ -37,6 +43,15 @@ const AdminLayout = () => {
                 >
                   <PenSquare className="h-4 w-4" />
                   New Post
+                </Button>
+              </Link>
+              <Link to="/admin/subscribers">
+                <Button
+                  variant={isActive("/admin/subscribers") ? "default" : "ghost"}
+                  className="flex items-center gap-2"
+                >
+                  <Mail className="h-4 w-4" />
+                  Subscribers
                 </Button>
               </Link>
             </nav>
