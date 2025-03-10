@@ -296,7 +296,11 @@ npx tailwindcss init -p</code></pre>
           category: formData.category,
           image_url: formData.imageUrl,
         });
-        alert("Post updated successfully!");
+        toast({
+          title: "Post Updated",
+          description: "Your post has been updated successfully!",
+          className: "bg-green-600 text-white",
+        });
       } else {
         // Create new post
         const newPost = await createPost({
@@ -332,9 +336,12 @@ npx tailwindcss init -p</code></pre>
           // Don't block the post creation if newsletter fails
         }
 
-        alert(
-          "Post published successfully and newsletter sent to subscribers!",
-        );
+        toast({
+          title: "Post Published",
+          description:
+            "Your post has been published and newsletter sent to subscribers!",
+          className: "bg-green-600 text-white",
+        });
       }
       navigate("/admin");
     } catch (err) {

@@ -10,6 +10,7 @@ import { AuthProvider } from "./components/auth/AuthContext";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import SubscribersList from "./components/admin/SubscribersList";
+import ContactSubmissions from "./components/admin/ContactSubmissions";
 import UnsubscribePage from "./components/UnsubscribePage";
 import { ToastProvider } from "./components/ui/toast-provider";
 import routes from "./tempo-routes";
@@ -48,6 +49,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="edit/:postId" element={<CreatePost />} />
             <Route path="subscribers" element={<SubscribersList />} />
+            <Route path="contacts" element={<ContactSubmissions />} />
           </Route>
 
           {/* Keep create post outside the layout for full-screen editing */}

@@ -79,6 +79,7 @@ const LoginForm = () => {
                 placeholder="admin@bloghub.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="focus:ring-2 focus:ring-primary/50"
                 required
               />
             </div>
@@ -89,6 +90,7 @@ const LoginForm = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="focus:ring-2 focus:ring-primary/50"
                 required
               />
             </div>

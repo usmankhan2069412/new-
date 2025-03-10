@@ -12,6 +12,7 @@ import {
 import Header from "./Header";
 import Footer from "./Footer";
 import { supabase } from "@/lib/supabase";
+import { useToast } from "./ui/use-toast";
 
 const UnsubscribePage = () => {
   const [searchParams] = useSearchParams();
@@ -20,6 +21,7 @@ const UnsubscribePage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const emailParam = searchParams.get("email");
@@ -60,6 +62,12 @@ const UnsubscribePage = () => {
       if (deleteError) throw deleteError;
 
       setSuccess(true);
+      toast({
+        title: "Unsubscribed",
+        description:
+          "You have been successfully unsubscribed from our newsletter",
+        className: "bg-slate-700 text-white",
+      });
     } catch (err) {
       console.error("Error unsubscribing:", err);
       setError("Failed to unsubscribe. Please try again later.");
@@ -108,7 +116,7 @@ const UnsubscribePage = () => {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                     placeholder="your@email.com"
                     required
                   />

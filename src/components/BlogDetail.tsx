@@ -449,7 +449,7 @@ const BlogDetail = () => {
                   {/* Comment Form */}
                   <form onSubmit={handleCommentSubmit} className="mb-8">
                     <textarea
-                      className="w-full p-3 border rounded-md bg-background resize-none min-h-[100px]"
+                      className="w-full p-3 border rounded-md bg-background resize-none min-h-[100px] focus:outline-none focus:ring-2 focus:ring-primary/50"
                       placeholder="Leave a comment..."
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
@@ -647,10 +647,13 @@ const BlogDetail = () => {
                       <input
                         type="email"
                         placeholder="Your email address"
-                        className="w-full p-2 border rounded-md bg-background"
+                        className="w-full p-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
                         required
                       />
-                      <Button type="submit" className="w-full">
+                      <Button
+                        type="submit"
+                        className="w-full bg-primary hover:bg-primary/90"
+                      >
                         Subscribe
                       </Button>
                     </form>

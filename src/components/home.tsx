@@ -109,7 +109,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       {/* SEO */}
       <SEO
         title="BlogHub - Modern Blog Platform"
@@ -190,7 +190,7 @@ const Home = () => {
       </main>
 
       {/* Newsletter Section */}
-      <section className="w-full bg-primary/5 py-16">
+      <section className="w-full bg-muted/50 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4 text-foreground">
             Subscribe to Our Newsletter
@@ -265,10 +265,13 @@ const Home = () => {
             <InputComponent
               type="email"
               placeholder="Your email address"
-              className="flex-grow"
+              className="flex-grow focus:ring-2 focus:ring-primary/50"
               required
             />
-            <Button type="submit" className="px-8">
+            <Button
+              type="submit"
+              className="px-8 bg-primary hover:bg-primary/90"
+            >
               Subscribe
             </Button>
           </form>
