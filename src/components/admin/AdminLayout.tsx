@@ -9,6 +9,7 @@ import {
   LogOut,
   Mail,
   MessageSquare,
+  Tag,
 } from "lucide-react";
 
 const AdminLayout = () => {
@@ -62,6 +63,15 @@ const AdminLayout = () => {
                 >
                   <MessageSquare className="h-4 w-4" />
                   Contact Messages
+                </Button>
+              </Link>
+              <Link to="/admin/categories">
+                <Button
+                  variant={isActive("/admin/categories") ? "default" : "ghost"}
+                  className="flex items-center gap-2"
+                >
+                  <Tag className="h-4 w-4" />
+                  Categories
                 </Button>
               </Link>
             </nav>

@@ -184,8 +184,8 @@ const Header = ({
       const container = document.getElementById("post-container");
       if (container) {
         container.className = newGridView
-          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
-          : "flex flex-col space-y-6 mb-10";
+          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 transition-all duration-500 ease-in-out"
+          : "flex flex-col space-y-6 mb-10 transition-all duration-500 ease-in-out";
         container.setAttribute("data-view-mode", newGridView ? "grid" : "list");
       }
     } catch (error) {

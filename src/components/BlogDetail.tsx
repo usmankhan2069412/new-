@@ -300,6 +300,8 @@ const BlogDetail = () => {
         imageUrl={post.imageUrl}
         author={post.author}
         slug={postId}
+        readTime={post.readTime}
+        content={post.content}
       />
 
       {/* Header */}

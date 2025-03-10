@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Header from "./Header";
 import FeaturedPost from "./FeaturedPost";
 import PostGrid from "./PostGrid";
-import SEO from "./SEO.jsx";
+import SEO from "./SEO";
 import Footer from "./Footer";
 import { getPosts } from "@/lib/api";
 import { Post } from "@/lib/api";
@@ -112,10 +112,23 @@ const Home = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900">
       {/* SEO */}
       <SEO
-        title="BlogHub - Modern Blog Platform"
-        description="A clean, responsive blogging platform with a focus on readability and content discovery. Explore our articles on web development, technology, design and more."
-        keywords="blog, articles, web development, technology, design, UX design, backend, architecture"
+        title="BlogHub - Modern Blog Platform | Web Development & Technology Articles"
+        description="A clean, responsive blogging platform with a focus on readability and content discovery. Explore our expert articles on web development, technology, design and more."
+        keywords="blog platform, web development articles, technology blog, design tutorials, UX design, backend development, architecture patterns, modern blog, responsive blog design, tech articles"
         ogImage="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "BlogHub",
+          url: typeof window !== "undefined" ? window.location.origin : "",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${typeof window !== "undefined" ? window.location.origin : ""}/?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+          description:
+            "A clean, responsive blogging platform with a focus on readability and content discovery. Explore our expert articles on web development, technology, design and more.",
+        }}
       />
 
       {/* Header */}

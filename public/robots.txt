@@ -1,7 +1,19 @@
+# www.robotstxt.org/
+
+# Allow crawling of all content
 User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /private/
 Disallow: /api/
+Disallow: /tempobook/
 
+# Block specific bots from heavy crawling
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Sitemap location
 Sitemap: https://bloghub.com/sitemap.xml

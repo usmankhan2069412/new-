@@ -80,8 +80,9 @@ const PostCard = ({
   return (
     <div
       className={cn(
-        "group bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer",
+        "group bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-md cursor-pointer",
         isGridView ? "flex flex-col" : "flex flex-row h-48",
+        "transition-all duration-500 ease-in-out transform hover:scale-[1.02]",
         className,
       )}
       onClick={onClick}
@@ -90,6 +91,7 @@ const PostCard = ({
         className={cn(
           "overflow-hidden",
           isGridView ? "h-48" : "w-48 h-full flex-shrink-0",
+          "transition-all duration-500 ease-in-out",
         )}
       >
         <img
@@ -103,6 +105,7 @@ const PostCard = ({
         className={cn(
           "flex flex-col",
           isGridView ? "p-4" : "p-4 flex-grow justify-between",
+          "transition-all duration-500 ease-in-out",
         )}
       >
         <div>

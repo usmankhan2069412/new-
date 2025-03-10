@@ -234,8 +234,8 @@ const PostGrid = ({
                       <div
                         className={
                           isGridView
-                            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                            : "flex flex-col space-y-6"
+                            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500 ease-in-out"
+                            : "flex flex-col space-y-6 transition-all duration-500 ease-in-out"
                         }
                       >
                         {currentPosts
@@ -265,8 +265,8 @@ const PostGrid = ({
             <div
               className={
                 isGridView
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
-                  : "flex flex-col space-y-6 mb-10"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 transition-all duration-500 ease-in-out"
+                  : "flex flex-col space-y-6 mb-10 transition-all duration-500 ease-in-out"
               }
               id="post-container"
               data-view-mode={isGridView ? "grid" : "list"}

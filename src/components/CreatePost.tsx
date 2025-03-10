@@ -219,7 +219,7 @@ npx tailwindcss init -p</code></pre>
     }
   }, [postId, navigate]);
 
-  const categories = [
+  const [categories, setCategories] = useState([
     "Web Development",
     "Technology",
     "Design",
@@ -229,7 +229,21 @@ npx tailwindcss init -p</code></pre>
     "Lifestyle",
     "Travel",
     "Health",
-  ];
+  ]);
+
+  // Load categories from localStorage
+  useEffect(() => {
+    try {
+      const savedCategories = JSON.parse(
+        localStorage.getItem("blog_categories") || "[]",
+      );
+      if (savedCategories.length > 0) {
+        setCategories(savedCategories.map((cat) => cat.name));
+      }
+    } catch (err) {
+      console.error("Error loading categories:", err);
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

@@ -76,7 +76,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black text-gray-300">
+    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-gray-300">
       {/* Newsletter Banner */}
 
       {/* Main Footer */}
