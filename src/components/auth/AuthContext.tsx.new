@@ -14,11 +14,7 @@ type AuthContextType = {
   logout: () => void;
   isAdmin: () => boolean;
   isLoading: boolean;
-  registerUser: (
-    name: string,
-    email: string,
-    password: string,
-  ) => Promise<boolean>;
+  registerUser: (name: string, email: string, password: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,28 +55,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!localStorage.getItem("blogHubUsers")) {
         localStorage.setItem("blogHubUsers", JSON.stringify([DEFAULT_ADMIN]));
       }
-
+      
       const users = JSON.parse(localStorage.getItem("blogHubUsers") || "[]");
       const foundUser = users.find(
-        (u) => u.email === email && u.password === password,
+        (u) => u.email === email && u.password === password
       );
 
       if (foundUser) {
         // Don't include password in the user object stored in state
         const { password, ...userWithoutPassword } = foundUser;
         setUser(userWithoutPassword);
-        localStorage.setItem(
-          "blogHubUser",
-          JSON.stringify(userWithoutPassword),
-        );
+        localStorage.setItem("blogHubUser", JSON.stringify(userWithoutPassword));
         return true;
       }
 
       // Fallback to default admin for backward compatibility
-      if (
-        email === DEFAULT_ADMIN.email &&
-        password === DEFAULT_ADMIN.password
-      ) {
+      if (email === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
         const adminUser = {
           id: DEFAULT_ADMIN.id,
           email: DEFAULT_ADMIN.email,
@@ -94,15 +84,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error during login:", error);
     }
-
+    
     return false;
   };
 
-  const registerUser = async (
-    name: string,
-    email: string,
-    password: string,
-  ): Promise<boolean> => {
+  const registerUser = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
       // Create new user without checking for existing users
       // This fixes the issue where it always says email is already registered
@@ -113,28 +99,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: "admin" as const,
         password, // In a real app, this would be hashed
       };
-
+      
       // Initialize or get the users array
       let users = [];
       try {
         users = JSON.parse(localStorage.getItem("blogHubUsers") || "[]");
       } catch (e) {
-        console.error(
-          "Error parsing users from localStorage, resetting array",
-          e,
-        );
+        console.error("Error parsing users from localStorage, resetting array", e);
         users = [];
       }
-
+      
       // Add to users array
       users.push(newUser);
       localStorage.setItem("blogHubUsers", JSON.stringify(users));
-
+      
       // Auto login the user
       const { password: _, ...userWithoutPassword } = newUser;
       setUser(userWithoutPassword);
       localStorage.setItem("blogHubUser", JSON.stringify(userWithoutPassword));
-
+      
       return true;
     } catch (error) {
       console.error("Error during registration:", error);
@@ -157,9 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, login, logout, isAdmin, isLoading, registerUser }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isLoading, registerUser }}>
       {children}
     </AuthContext.Provider>
   );

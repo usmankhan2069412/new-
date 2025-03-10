@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -13,7 +13,7 @@ import {
 } from "../ui/card";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useAuth } from "./AuthContext";
-import { Lock } from "lucide-react";
+import { Lock, UserPlus } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 
 const LoginForm = () => {
@@ -95,10 +95,21 @@ const LoginForm = () => {
               />
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
+              <Lock className="mr-2 h-4 w-4" />
               {isLoading ? "Logging in..." : "Login"}
             </Button>
+            <div className="text-center text-sm">
+              Need an admin account?{" "}
+              <Link
+                to="/signup"
+                className="text-primary hover:underline font-medium"
+              >
+                <UserPlus className="inline h-3 w-3 mr-1" />
+                Sign up with invitation code
+              </Link>
+            </div>
           </CardFooter>
         </form>
       </Card>

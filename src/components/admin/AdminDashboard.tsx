@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { PenSquare, Trash2, Plus, BarChart, Eye } from "lucide-react";
+import { PenSquare, Trash2, Plus, BarChart, Eye, Users } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { getPosts, deletePost } from "@/lib/api";
 import { Post } from "@/lib/api";
@@ -29,6 +29,7 @@ import {
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const AdminDashboard = () => {
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [registeredUsers, setRegisteredUsers] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -55,7 +57,23 @@ const AdminDashboard = () => {
       }
     };
 
+    const fetchUsers = () => {
+      try {
+        // Get registered users from localStorage
+        const users = JSON.parse(localStorage.getItem("blogHubUsers") || "[]");
+        // Remove passwords for security
+        const usersWithoutPasswords = users.map(
+          ({ password, ...rest }) => rest,
+        );
+        setRegisteredUsers(usersWithoutPasswords);
+      } catch (err) {
+        console.error("Error loading users:", err);
+        setRegisteredUsers([]);
+      }
+    };
+
     fetchPosts();
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -132,7 +150,7 @@ const AdminDashboard = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
@@ -164,6 +182,17 @@ const AdminDashboard = () => {
                 ? format(new Date(posts[0].date), "MMM d, yyyy")
                 : ""}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">
+              Registered Users
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{registeredUsers.length}</div>
           </CardContent>
         </Card>
       </div>
@@ -212,112 +241,176 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Manage Posts</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPosts.length === 0 ? (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Manage Posts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center py-8 text-muted-foreground"
-                    >
-                      {searchQuery || categoryFilter
-                        ? "No posts match your search criteria."
-                        : "No posts found. Create your first post to get started."}
-                    </TableCell>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ) : (
-                  filteredPosts.map((post) => (
-                    <TableRow key={post.id}>
-                      <TableCell className="font-medium max-w-md truncate">
-                        {post.title}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{post.category}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {post.date
-                          ? format(new Date(post.date), "MMM d, yyyy")
-                          : "Unknown"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleView(post.id)}
-                            title="View post"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(post.id)}
-                            title="Edit post"
-                          >
-                            <PenSquare className="h-4 w-4" />
-                          </Button>
-
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-destructive hover:text-destructive/90"
-                                title="Delete post"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete the post titled "
-                                  {post.title}" and remove it from our servers.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(post.id)}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  disabled={deleteLoading === post.id}
-                                >
-                                  {deleteLoading === post.id
-                                    ? "Deleting..."
-                                    : "Delete"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredPosts.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={4}
+                        className="text-center py-8 text-muted-foreground"
+                      >
+                        {searchQuery || categoryFilter
+                          ? "No posts match your search criteria."
+                          : "No posts found. Create your first post to get started."}
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                  ) : (
+                    filteredPosts.map((post) => (
+                      <TableRow key={post.id}>
+                        <TableCell className="font-medium max-w-md truncate">
+                          {post.title}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{post.category}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {post.date
+                            ? format(new Date(post.date), "MMM d, yyyy")
+                            : "Unknown"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleView(post.id)}
+                              title="View post"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(post.id)}
+                              title="Edit post"
+                            >
+                              <PenSquare className="h-4 w-4" />
+                            </Button>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-destructive hover:text-destructive/90"
+                                  title="Delete post"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you sure?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete the post titled "
+                                    {post.title}" and remove it from our
+                                    servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(post.id)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    disabled={deleteLoading === post.id}
+                                  >
+                                    {deleteLoading === post.id
+                                      ? "Deleting..."
+                                      : "Delete"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" /> Registered Users
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {registeredUsers.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        className="text-center py-8 text-muted-foreground"
+                      >
+                        No registered users found.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    registeredUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                              />
+                              <AvatarFallback>
+                                {user.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{user.name}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              user.role === "admin" ? "default" : "outline"
+                            }
+                          >
+                            {user.role}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

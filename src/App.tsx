@@ -5,6 +5,7 @@ import CreatePost from "./components/CreatePost";
 import BlogDetail from "./components/BlogDetail";
 import ContactUs from "./components/ContactUs";
 import LoginForm from "./components/auth/LoginForm";
+import SignupForm from "./components/auth/SignupForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./components/auth/AuthContext";
 import AdminDashboard from "./components/admin/AdminDashboard";
@@ -35,6 +36,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignupForm />} />
           <Route path="/post/:postId" element={<BlogDetail />} />
           <Route path="/contact" element={<ContactUs />} />
 
