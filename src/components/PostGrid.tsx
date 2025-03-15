@@ -106,17 +106,66 @@ const PostGrid = ({
   const postsPerPage = 6;
   const postLimitForSlider = 9; // Limit after which slider is shown
 
-  // Listen for view mode changes from Header component
+  // State to track dynamic categories from admin panel
+  const [dynamicCategoryList, setDynamicCategoryList] =
+    useState<string[]>(categories);
+
+  // Listen for view mode changes from Header component and category updates from CategoryManager
   useEffect(() => {
     const handleViewModeChange = (event: CustomEvent) => {
       setIsGridView(event.detail.isGridView);
     };
 
-    // Add event listener
+    const handleCategoriesUpdated = (event: CustomEvent) => {
+      const updatedCategories = event.detail.categories;
+      // Extract category names and add "All" at the beginning
+      const categoryNames = [
+        "All",
+        ...updatedCategories.map((cat: any) => cat.name),
+      ];
+
+      // Update our local state with the new categories
+      setDynamicCategoryList(categoryNames);
+
+      // Notify other components about the category update
+      window.dispatchEvent(
+        new CustomEvent("updatePostGridCategories", {
+          detail: { categories: categoryNames },
+        }),
+      );
+
+      // If the current active category was deleted, switch to "All"
+      if (activeCategory !== "All" && !categoryNames.includes(activeCategory)) {
+        setActiveCategory("All");
+      }
+    };
+
+    // Add event listeners
     window.addEventListener(
       "viewModeChange",
       handleViewModeChange as EventListener,
     );
+
+    window.addEventListener(
+      "categoriesUpdated",
+      handleCategoriesUpdated as EventListener,
+    );
+
+    // Load categories from localStorage on component mount
+    try {
+      const savedCategories = JSON.parse(
+        localStorage.getItem("blog_categories") || "[]",
+      );
+      if (savedCategories.length > 0) {
+        const categoryNames = [
+          "All",
+          ...savedCategories.map((cat: any) => cat.name),
+        ];
+        setDynamicCategoryList(categoryNames);
+      }
+    } catch (error) {
+      console.error("Error loading categories from localStorage:", error);
+    }
 
     // Check for existing view mode in localStorage
     try {
@@ -133,17 +182,79 @@ const PostGrid = ({
         "viewModeChange",
         handleViewModeChange as EventListener,
       );
+      window.removeEventListener(
+        "categoriesUpdated",
+        handleCategoriesUpdated as EventListener,
+      );
     };
-  }, []);
+  }, [activeCategory]);
 
-  // Listen for search query changes from URL
+  // Listen for search query and category changes from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const query = params.get("q");
+    const category = params.get("category");
+
     if (query) {
       setSearchQuery(query);
     }
-  }, []);
+
+    if (category) {
+      // Check if the category exists in our categories list
+      if (dynamicCategoryList.includes(category)) {
+        setActiveCategory(category);
+      } else if (category !== "All") {
+        // If it's a new category not in our predefined list, add it
+        console.log(`Adding new category from URL: ${category}`);
+      }
+    }
+  }, [dynamicCategoryList, window.location.search]);
+
+  // Listen for specific category filter updates
+  useEffect(() => {
+    const handleCategoryFilterUpdate = (event: CustomEvent) => {
+      const { action, category, oldName, newName } = event.detail;
+
+      if (action === "add") {
+        // Add the new category to our list if it's not already there
+        if (!dynamicCategoryList.includes(category)) {
+          setDynamicCategoryList((prev) => [...prev, category]);
+        }
+      } else if (action === "delete") {
+        // Remove the category from our list
+        setDynamicCategoryList((prev) =>
+          prev.filter((cat) => cat !== category),
+        );
+
+        // If the active category was deleted, switch to "All"
+        if (activeCategory === category) {
+          setActiveCategory("All");
+        }
+      } else if (action === "edit") {
+        // Replace the old category name with the new one
+        setDynamicCategoryList((prev) =>
+          prev.map((cat) => (cat === oldName ? newName : cat)),
+        );
+
+        // If the active category was edited, update it
+        if (activeCategory === oldName) {
+          setActiveCategory(newName);
+        }
+      }
+    };
+
+    window.addEventListener(
+      "categoryFilterUpdate",
+      handleCategoryFilterUpdate as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "categoryFilterUpdate",
+        handleCategoryFilterUpdate as EventListener,
+      );
+    };
+  }, [activeCategory, dynamicCategoryList]);
 
   // Normalize posts to ensure they have imageUrl property
   const normalizedPosts = posts.map((post) => ({
@@ -184,21 +295,38 @@ const PostGrid = ({
 
         {!searchQuery && (
           <Tabs defaultValue="All" className="w-full">
-            <TabsList className="mb-8 flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  onClick={() => {
-                    setActiveCategory(category);
-                    setCurrentPage(1);
-                  }}
-                  className="px-4 py-2"
-                >
-                  {category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className="categories-scroll-container">
+              <TabsList className="mb-8 flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+                {dynamicCategoryList.map((category) => (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    onClick={() => {
+                      setActiveCategory(category);
+                      setCurrentPage(1);
+                      // Update URL with category parameter
+                      const url = new URL(window.location.href);
+                      if (category === "All") {
+                        url.searchParams.delete("category");
+                      } else {
+                        url.searchParams.set("category", category);
+                      }
+                      window.history.pushState({}, "", url);
+
+                      // Dispatch a custom event that other components can listen for
+                      window.dispatchEvent(
+                        new CustomEvent("categoryChange", {
+                          detail: { category: category },
+                        }),
+                      );
+                    }}
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base whitespace-nowrap flex-shrink-0"
+                  >
+                    {category}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
           </Tabs>
         )}
 

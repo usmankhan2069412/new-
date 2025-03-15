@@ -137,6 +137,20 @@ const CategoryManager = () => {
     saveCategories(updatedCategories);
     setNewCategory("");
 
+    // Dispatch a custom event to notify other components about the category change
+    window.dispatchEvent(
+      new CustomEvent("categoriesUpdated", {
+        detail: { categories: updatedCategories },
+      }),
+    );
+
+    // Also dispatch an event specifically for the filter bar in PostGrid
+    window.dispatchEvent(
+      new CustomEvent("categoryFilterUpdate", {
+        detail: { action: "add", category: newCategoryObj.name },
+      }),
+    );
+
     toast({
       title: "Category Added",
       description: `Category "${newCategoryObj.name}" has been added successfully`,
@@ -166,6 +180,12 @@ const CategoryManager = () => {
       return;
     }
 
+    // Find the original category to get the old name
+    const originalCategory = categories.find(
+      (cat) => cat.id === editingCategory.id,
+    );
+    const oldCategoryName = originalCategory ? originalCategory.name : "";
+
     const updatedCategories = categories.map((cat) =>
       cat.id === editingCategory.id
         ? {
@@ -179,6 +199,24 @@ const CategoryManager = () => {
     saveCategories(updatedCategories);
     setEditingCategory(null);
 
+    // Dispatch a custom event to notify other components about the category change
+    window.dispatchEvent(
+      new CustomEvent("categoriesUpdated", {
+        detail: { categories: updatedCategories },
+      }),
+    );
+
+    // Also dispatch an event specifically for the filter bar in PostGrid
+    window.dispatchEvent(
+      new CustomEvent("categoryFilterUpdate", {
+        detail: {
+          action: "edit",
+          oldName: oldCategoryName,
+          newName: editingCategory.name,
+        },
+      }),
+    );
+
     toast({
       title: "Category Updated",
       description: `Category has been updated successfully`,
@@ -191,9 +229,27 @@ const CategoryManager = () => {
   };
 
   const handleDeleteCategory = (categoryId: string) => {
+    // Find the category to be deleted to get its name
+    const categoryToDelete = categories.find((cat) => cat.id === categoryId);
+    const categoryName = categoryToDelete ? categoryToDelete.name : "";
+
     const updatedCategories = categories.filter((cat) => cat.id !== categoryId);
     setCategories(updatedCategories);
     saveCategories(updatedCategories);
+
+    // Dispatch a custom event to notify other components about the category change
+    window.dispatchEvent(
+      new CustomEvent("categoriesUpdated", {
+        detail: { categories: updatedCategories },
+      }),
+    );
+
+    // Also dispatch an event specifically for the filter bar in PostGrid
+    window.dispatchEvent(
+      new CustomEvent("categoryFilterUpdate", {
+        detail: { action: "delete", category: categoryName },
+      }),
+    );
 
     toast({
       title: "Category Deleted",

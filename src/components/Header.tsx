@@ -11,6 +11,7 @@ import {
   Sun,
   Moon,
   LayoutGrid,
+  List,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "./ui/sheet";
 import {
@@ -55,6 +56,9 @@ const Header = ({
     console.log(`Selected category: ${category}`),
   posts = [],
 }: HeaderProps) => {
+  // Update categories with any new ones from posts
+  const [dynamicCategories, setDynamicCategories] =
+    useState<string[]>(categories);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,17 +68,136 @@ const Header = ({
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
-  // Initialize view mode from localStorage
+  // Update categories when posts change or when categories are updated from admin
+  useEffect(() => {
+    if (posts.length > 0) {
+      const updatedCategories = extractCategories(posts);
+      setDynamicCategories(updatedCategories);
+    }
+
+    // Check for category in URL on component mount
+    const params = new URLSearchParams(window.location.search);
+    const categoryParam = params.get("category");
+    if (categoryParam) {
+      onCategorySelect(categoryParam);
+    }
+
+    // Listen for category updates from CategoryManager
+    const handleCategoriesUpdated = (event: CustomEvent) => {
+      const updatedCategoryObjects = event.detail.categories;
+      // Extract category names
+      const categoryNames = updatedCategoryObjects.map((cat: any) => cat.name);
+      // Update dynamic categories
+      setDynamicCategories(categoryNames);
+    };
+
+    // Add event listener for category updates
+    window.addEventListener(
+      "categoriesUpdated",
+      handleCategoriesUpdated as EventListener,
+    );
+
+    // Listen for PostGrid category updates
+    const handlePostGridCategoriesUpdate = (event: CustomEvent) => {
+      const updatedCategories = event.detail.categories;
+      // Remove "All" from the beginning if it exists
+      const categoryNames =
+        updatedCategories[0] === "All"
+          ? updatedCategories.slice(1)
+          : updatedCategories;
+      setDynamicCategories(categoryNames);
+    };
+
+    window.addEventListener(
+      "updatePostGridCategories",
+      handlePostGridCategoriesUpdate as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "categoriesUpdated",
+        handleCategoriesUpdated as EventListener,
+      );
+      window.removeEventListener(
+        "updatePostGridCategories",
+        handlePostGridCategoriesUpdate as EventListener,
+      );
+    };
+  }, [posts, onCategorySelect]);
+
+  // Initialize view mode from localStorage and listen for category changes
   useEffect(() => {
     try {
       const savedViewMode = localStorage.getItem("viewMode");
       if (savedViewMode !== null) {
         setIsGridView(savedViewMode === "grid");
       }
+
+      // Listen for category changes from PostGrid
+      const handleCategoryChange = (event: CustomEvent) => {
+        const selectedCategory = event.detail.category;
+        console.log(`Category changed to: ${selectedCategory}`);
+        // Update the UI to reflect the selected category
+        if (selectedCategory !== "All") {
+          onCategorySelect(selectedCategory);
+        }
+      };
+
+      window.addEventListener(
+        "categoryChange",
+        handleCategoryChange as EventListener,
+      );
+
+      return () => {
+        window.removeEventListener(
+          "categoryChange",
+          handleCategoryChange as EventListener,
+        );
+      };
     } catch (error) {
       console.error("Error reading view mode from localStorage:", error);
     }
-  }, []);
+  }, [onCategorySelect]);
+
+  // Get all categories from posts and localStorage
+  const extractCategories = (posts: any[]) => {
+    const uniqueCategories = new Set<string>();
+
+    // Add default categories
+    categories.forEach((cat) => uniqueCategories.add(cat));
+
+    // Add categories from posts
+    posts.forEach((post) => {
+      if (post.category) {
+        uniqueCategories.add(post.category);
+      }
+    });
+
+    // Check URL for any additional categories
+    const params = new URLSearchParams(window.location.search);
+    const categoryParam = params.get("category");
+    if (categoryParam && !uniqueCategories.has(categoryParam)) {
+      uniqueCategories.add(categoryParam);
+    }
+
+    // Check localStorage for categories from admin panel
+    try {
+      const savedCategories = JSON.parse(
+        localStorage.getItem("blog_categories") || "[]",
+      );
+      if (savedCategories.length > 0) {
+        savedCategories.forEach((cat: any) => {
+          if (cat.name) {
+            uniqueCategories.add(cat.name);
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error loading categories from localStorage:", error);
+    }
+
+    return Array.from(uniqueCategories);
+  };
 
   // Get all posts from home component
   const allPosts =
@@ -249,30 +372,6 @@ const Header = ({
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent">
-                  Categories
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    {categories.map((category) => (
-                      <li key={category}>
-                        <NavigationMenuLink asChild>
-                          <a
-                            href={`#${category.toLowerCase()}`}
-                            onClick={() => onCategorySelect(category)}
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">
-                              {category}
-                            </div>
-                          </a>
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
                 <Link
                   to="/contact"
                   className="flex items-center px-4 py-2 text-sm font-medium"
@@ -341,7 +440,11 @@ const Header = ({
                     onClick={toggleGridView}
                     className="h-10 w-10"
                   >
-                    <LayoutGrid className="h-5 w-5" />
+                    {isGridView ? (
+                      <List className="h-5 w-5" />
+                    ) : (
+                      <LayoutGrid className="h-5 w-5" />
+                    )}
                     <span className="sr-only">
                       {isGridView
                         ? "Switch to list view"
@@ -486,21 +589,9 @@ const Header = ({
                   </div>
                 </div>
 
-                {/* Mobile Categories */}
+                {/* Mobile Navigation */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-medium">Categories</h3>
                   <nav className="flex flex-col space-y-2">
-                    {categories.map((category) => (
-                      <SheetClose asChild key={category}>
-                        <a
-                          href={`#${category.toLowerCase()}`}
-                          onClick={() => onCategorySelect(category)}
-                          className="px-2 py-1.5 text-sm rounded-md hover:bg-accent"
-                        >
-                          {category}
-                        </a>
-                      </SheetClose>
-                    ))}
                     <SheetClose asChild>
                       <Link
                         to="/contact"
