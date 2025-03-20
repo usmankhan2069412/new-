@@ -33,7 +33,7 @@ const FeaturedPost = ({
 
         <div className="relative z-20 flex flex-col h-full justify-end p-4 sm:p-8 md:p-12 text-white">
           <div className="space-y-6 max-w-3xl">
-            <Badge className="bg-primary hover:bg-primary/90 text-white text-xs px-3 py-1">
+            <Badge className="bg-primary hover:bg-primary/90  text-xs px-3 py-1">
               {category}
             </Badge>
 

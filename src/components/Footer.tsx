@@ -76,11 +76,11 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-gray-300">
+    <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
       {/* Newsletter Banner */}
 
       {/* Main Footer */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 ">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Logo and Tagline */}
           <div className="space-y-4">
@@ -89,7 +89,7 @@ const Footer = () => {
                 <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
                   <span className="text-white font-bold">B</span>
                 </div>
-                <span className="text-white text-xl font-bold">BlogHub</span>
+                <span className=" text-xl font-bold">BlogHub</span>
               </div>
             </Link>
             <p className="text-sm leading-relaxed">
@@ -131,12 +131,12 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-medium mb-4 text-lg">Quick Links</h3>
+            <h3 className=" font-medium  mb-4 text-lg">Quick Links</h3>
             <ul className="space-y-3">
               <li>
                 <Link
                   to="/"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className=" transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Home
@@ -145,7 +145,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className="transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Featured Posts
@@ -154,7 +154,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className="transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Contact Us
@@ -163,7 +163,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/login"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className="transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Admin Login
@@ -174,12 +174,12 @@ const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h3 className="text-white font-medium mb-4 text-lg">Categories</h3>
+            <h3 className=" font-medium mb-4 text-lg">Categories</h3>
             <ul className="space-y-3">
               <li>
                 <Link
                   to="/?category=Web%20Development"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className=" transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Web Development
@@ -188,7 +188,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/?category=Technology"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className=" transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Technology
@@ -197,7 +197,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/?category=Design"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className=" transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Design
@@ -206,7 +206,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/?category=Architecture"
-                  className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-2"
+                  className=" transition-colors text-sm flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                   Architecture
@@ -217,14 +217,14 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-white font-medium mb-4 text-lg">Contact Us</h3>
+            <h3 className=" font-medium mb-4 text-lg">Contact Us</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <MapPin
                   size={18}
                   className="text-primary mt-0.5 flex-shrink-0"
                 />
-                <span className="text-gray-400 text-sm">
+                <span className="text-sm">
                   100 Smith Street, Collingwood VIC 3066, Australia
                 </span>
               </li>
@@ -232,7 +232,7 @@ const Footer = () => {
                 <Phone size={18} className="text-primary flex-shrink-0" />
                 <a
                   href="tel:+61412345678"
-                  className="text-gray-400 hover:text-white text-sm"
+                  className=" text-sm"
                 >
                   +61 4 1234 5678
                 </a>
@@ -241,14 +241,14 @@ const Footer = () => {
                 <Mail size={18} className="text-primary flex-shrink-0" />
                 <a
                   href="mailto:info@bloghub.com"
-                  className="text-gray-400 hover:text-white text-sm"
+                  className=" text-sm"
                 >
                   info@bloghub.com
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Rss size={18} className="text-primary flex-shrink-0" />
-                <a href="#" className="text-gray-400 hover:text-white text-sm">
+                <a href="#" className=" text-sm">
                   RSS Feed
                 </a>
               </li>
@@ -264,25 +264,25 @@ const Footer = () => {
           <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
             <Link
               to="/"
-              className="text-sm text-gray-500 hover:text-white transition-colors"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               to="/"
-              className="text-sm text-gray-500 hover:text-white transition-colors"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
             >
               Terms of Service
             </Link>
             <Link
               to="/"
-              className="text-sm text-gray-500 hover:text-white transition-colors"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
             >
               Cookie Policy
             </Link>
             <Link
               to="/unsubscribe"
-              className="text-sm text-gray-500 hover:text-white transition-colors"
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
             >
               Unsubscribe
             </Link>

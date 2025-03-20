@@ -205,7 +205,7 @@ const ContactUs = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-white text-black hover:bg-gray-200"
+                    className="w-full bg-white text-black hover:bg-gray-200 hover:text-black"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Sending..." : "Send message"}
@@ -214,13 +214,13 @@ const ContactUs = () => {
               )}
 
               {/* Contact Info */}
-              <div className="space-y-12">
+              <div className="space-y-12 mt-12 text-foreground">
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">Call us</h2>
                   <p className="text-gray-400">Call our team Mon-Fri</p>
                   <Button
                     variant="outline"
-                    className="w-full border-gray-700 text-white hover:bg-gray-800"
+                    className="w-full  border-gray-700"
                   >
                     <Phone className="mr-2 h-4 w-4" />
                     +92 3422069412
@@ -235,14 +235,14 @@ const ContactUs = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <Button
                       variant="outline"
-                      className="border-gray-700 text-white hover:bg-gray-800"
+                      className="border-gray-700 "
                     >
                       <Mail className="mr-2 h-4 w-4" />
                       Send email
                     </Button>
                     <Button
                       variant="outline"
-                      className="border-gray-700 text-white hover:bg-gray-800"
+                      className="border-gray-700 "
                     >
                       <svg
                         className="mr-2 h-4 w-4"
@@ -255,20 +255,6 @@ const ContactUs = () => {
                       Twitter
                     </Button>
                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">Visit us</h2>
-                  <p className="text-gray-400">
-                    Chat to us in person at our Melbourne HQ
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-full border-gray-700 text-white hover:bg-gray-800"
-                  >
-                    <MapPin className="mr-2 h-4 w-4" />
-                    100 Smith Street, Collingwood VIC 3066
-                  </Button>
                 </div>
               </div>
             </div>

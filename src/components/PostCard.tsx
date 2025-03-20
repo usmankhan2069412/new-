@@ -80,7 +80,7 @@ const PostCard = ({
   return (
     <div
       className={cn(
-        "group bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-md cursor-pointer",
+        "group bg-card  rounded-lg overflow-hidden shadow-sm hover:shadow-md cursor-pointer",
         isGridView ? "flex flex-col" : "flex flex-row h-48",
         "transition-all duration-500 ease-in-out transform hover:scale-[1.02]",
         className,
